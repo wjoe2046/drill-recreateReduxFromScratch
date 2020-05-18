@@ -1,144 +1,114 @@
-//library
-function createStore(reducer) {
-  // The store should have four parts
-  // 1. The state
-  // 2. Get the state. (getState)
-  // 3. Listen to changes on the state. (subscribe)
-  // 4. Update the state (dispatch)
+(function () {
+  window.API = {};
 
-  let state;
-  let listeners = [];
-
-  const getState = () => state;
-
-  const subscribe = (listener) => {
-    listeners.push(listener);
-    return () => {
-      listeners = listeners.filter((l) => l !== listener);
-    };
-  };
-
-  const dispatch = (action) => {
-    state = reducer(state, action);
-    listeners.forEach((listener) => listener());
-  };
-
-  return {
-    getState,
-    subscribe,
-    dispatch,
-  };
-}
-
-//app code
-const ADD_TODO = 'ADD_TODO';
-const REMOVE_TODO = 'REMOVE_TODO';
-const TOGGLE_TODO = 'TOGGLE_TODO';
-const ADD_GOAL = 'ADD_GOAL';
-const REMOVE_GOAL = 'REMOVE_GOAL';
-
-function addTodoAction(todo) {
-  return {
-    type: ADD_TODO,
-    todo,
-  };
-}
-
-//REDUCER FUNCTION
-function todos(state = [], action) {
-  switch (action.type) {
-    case ADD_TODO:
-      return state.concat([action.todo]);
-    case REMOVE_TODO:
-      return state.filter((todo) => todo.id !== action.id);
-    case TOGGLE_TODO:
-      return state.map((todo) =>
-        todo.id !== action.id
-          ? todo
-          : Object.assign({}, todo, { complete: !todo.complete })
-      );
-    default:
-      return state;
+  function fail() {
+    return Math.floor(Math.random() * (5 - 1)) === 3;
   }
-}
 
-function goals(state = [], action) {
-  switch (action.type) {
-    case ADD_GOAL:
-      return state.concat([action.goal]);
-    case REMOVE_GOAL:
-      return state.filter((goal) => goal.id !== action.id);
-    default:
-      return state;
+  function generateId() {
+    return Math.random().toString(36).substring(2);
   }
-}
 
-function app(state = {}, action) {
-  return {
-    todos: todos(state.todos, action),
-    goals: goals(state.goals, action),
+  var goals = [
+    {
+      id: generateId(),
+      name: 'Learn Redux',
+    },
+    {
+      id: generateId(),
+      name: 'Read 50 books this year',
+    },
+  ];
+  var todos = [
+    {
+      id: generateId(),
+      name: 'Walk the dog',
+      complete: false,
+    },
+    {
+      id: generateId(),
+      name: 'Wash the car',
+      complete: false,
+    },
+    {
+      id: generateId(),
+      name: 'Go to the gym',
+      complete: true,
+    },
+  ];
+
+  API.fetchGoals = function () {
+    return new Promise((res, rej) => {
+      setTimeout(function () {
+        res(goals);
+      }, 2000);
+    });
   };
-}
 
-const store = createStore(app);
+  API.fetchTodos = function () {
+    return new Promise((res, rej) => {
+      setTimeout(function () {
+        res(todos);
+      }, 2000);
+    });
+  };
 
-store.subscribe(() => {
-  console.log('The new state is: ', store.getState());
-});
+  API.saveTodo = function (name) {
+    return new Promise((res, rej) => {
+      setTimeout(() => {
+        const todo = {
+          id: generateId(),
+          name: name,
+          complete: false,
+        };
+        todos = todos.concat([todo]);
+        fail() ? rej(todo) : res(todo);
+      }, 300);
+    });
+  };
 
-store.dispatch(
-  addTodoAction({
-    id: 0,
-    name: 'Walk the dog',
-    complete: false,
-  })
-);
+  API.saveGoal = function (name) {
+    return new Promise((res, rej) => {
+      setTimeout(() => {
+        const goal = {
+          id: generateId(),
+          name: name,
+        };
+        goals = goals.concat([goal]);
+        fail() ? rej(goal) : res(goal);
+      }, 300);
+    });
+  };
 
-store.dispatch({
-  type: 'ADD_TODO',
-  todo: {
-    id: 1,
-    name: 'Wash the car',
-    complete: false,
-  },
-});
+  API.deleteGoal = function (id) {
+    return new Promise((res, rej) => {
+      setTimeout(() => {
+        goals = goals.filter((goal) => goal.id !== id);
+        fail() ? rej() : res(goals);
+      }, 300);
+    });
+  };
 
-store.dispatch({
-  type: 'ADD_TODO',
-  todo: {
-    id: 2,
-    name: 'Go to the gym',
-    complete: true,
-  },
-});
+  API.deleteTodo = function (id) {
+    return new Promise((res, rej) => {
+      setTimeout(() => {
+        todos = todos.filter((todo) => todo.id !== id);
+        fail() ? rej() : res(todos);
+      }, 300);
+    });
+  };
 
-store.dispatch({
-  type: 'REMOVE_TODO',
-  id: 1,
-});
+  API.saveTodoToggle = function (id) {
+    return new Promise((res, rej) => {
+      setTimeout(() => {
+        todos = todos.map((todo) =>
+          todo.id !== id
+            ? todo
+            : Object.assign({}, todo, { complete: !todo.complete })
+        );
 
-store.dispatch({
-  type: 'TOGGLE_TODO',
-  id: 0,
-});
-
-store.dispatch({
-  type: 'ADD_GOAL',
-  goal: {
-    id: 0,
-    name: 'Learn Redux',
-  },
-});
-
-store.dispatch({
-  type: 'ADD_GOAL',
-  goal: {
-    id: 1,
-    name: 'Lose 20 pounds',
-  },
-});
-
-store.dispatch({
-  type: 'REMOVE_GOAL',
-  id: 0,
-});
+        fail() ? rej() : res(todos);
+      }, 300);
+    });
+  };
+})();
