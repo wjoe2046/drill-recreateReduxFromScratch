@@ -368,21 +368,6 @@
         App
       );
 
-      // class ConnectedGoals extends React.Component {
-      //   render() {
-      //     console.log('i am connected goals');
-      //     return (
-      //       <Context.Consumer>
-      //         {(store) => {
-      //           const { goals } = store.getState();
-
-      //           return <Goals goals={goals} dispatch={store.dispatch} />;
-      //         }}
-      //       </Context.Consumer>
-      //     );
-      //   }
-      // }
-
       const ConnectedGoals = connect((state) => ({
         todos: state.todos,
       }))(Todos);
@@ -390,21 +375,6 @@
       const ConnectedTodos = connect((state) => ({
         goals: state.goals,
       }))(Goals);
-
-      // class ConnectedTodos extends React.Component {
-      //   render() {
-      //     console.log('i am connected todos');
-      //     return (
-      //       <Context.Consumer>
-      //         {(store) => {
-      //           const { todos } = store.getState();
-
-      //           return <Todos todos={todos} dispatch={store.dispatch} />;
-      //         }}
-      //       </Context.Consumer>
-      //     );
-      //   }
-      // }
 
       class Provider extends React.Component {
         render() {
